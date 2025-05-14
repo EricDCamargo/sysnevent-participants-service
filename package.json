@@ -1,0 +1,33 @@
+{
+  "name": "sysnevent-tickets-service",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/SysNevent/sysnevent-tickets-service.git",
+  "author": "EricDCamargo <ericdcamargo@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "dev": "ts-node-dev src/server.ts",
+    "build": "tsc --build",
+    "start": "node dist/server.js",
+    "vercel-build": "prisma generate && prisma migrate deploy",
+    "prisma:generate": "prisma generate"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.15",
+    "@types/express": "^4.17.20",
+    "@types/jsonwebtoken": "^9.0.9",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.5.2",
+    "axios": "^1.9.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-async-errors": "^3.1.1",
+    "http-status-codes": "^2.3.0",
+    "jsonwebtoken": "^9.0.2",
+    "prisma": "^5.5.2"
+  }
+}
