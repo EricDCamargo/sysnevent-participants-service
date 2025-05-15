@@ -5,7 +5,7 @@ import { DeleteTicketService } from '../../services/ticket/DeleteTicketService'
 
 class DeleteTicketController {
   async handle(req: Request, res: Response) {
-    const ticket_id = req.params.id
+    const ticket_id = req.query.ticket_id as string
     const participant_id = req.user_id
 
     const deleteTicketService = new DeleteTicketService()

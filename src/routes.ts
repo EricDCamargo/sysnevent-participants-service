@@ -8,10 +8,6 @@ const router = Router()
 
 router.post('/tickets', isAuthenticated, new CreateTicketController().handle)
 router.get('/tickets', isAuthenticated, new ListTicketsController().handle)
-router.delete(
-  '/tickets/:id',
-  isAuthenticated,
-  new DeleteTicketController().handle
-)
+router.delete('/tickets', isAuthenticated, new DeleteTicketController().handle)
 
 export { router }
