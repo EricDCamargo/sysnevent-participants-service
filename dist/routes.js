@@ -1,0 +1,13 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.router = void 0;
+const express_1 = require("express");
+const isAuthenticated_1 = require("./middlewares/isAuthenticated");
+const CreateParticipantController_1 = require("./controllers/participants/CreateParticipantController");
+const ListParticipantsByEventController_1 = require("./controllers/participants/ListParticipantsByEventController");
+const TogglePresenceController_1 = require("./controllers/participants/TogglePresenceController");
+const router = (0, express_1.Router)();
+exports.router = router;
+router.post('/participants', isAuthenticated_1.isAuthenticated, new CreateParticipantController_1.CreateParticipantController().handle);
+router.get('/participants', isAuthenticated_1.isAuthenticated, new ListParticipantsByEventController_1.ListParticipantsByEventController().handle);
+router.patch('/participants/presence/toggle', isAuthenticated_1.isAuthenticated, new TogglePresenceController_1.TogglePresenceController().handle);

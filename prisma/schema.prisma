@@ -5,19 +5,50 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  schemas  = ["participants"]
 }
 
-model Ticket {
-  id            String   @id @default(uuid())
-  eventId       String
-  participantId String
-  purchaseDate  DateTime @default(now())
+enum Course {
+  ADS
+  GE
+  GTI
+  GEMP
+  MEC
 
-  @@unique([eventId, participantId])
+  @@schema("participants")
+}
+
+enum Semester {
+  SEM1
+  SEM2
+  SEM3
+  SEM4
+  SEM5
+  SEM6
+
+  @@schema("participants")
+}
+
+model Participant {
+  id        String    @id @default(uuid())
+  eventId   String
+  name      String
+  email     String
+  course    Course?
+  semester  Semester?
+  ra        String?   @db.VarChar(12)
+  isPresent Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@unique([eventId, ra])
+  @@unique([eventId, email])
+  @@schema("participants")
 }

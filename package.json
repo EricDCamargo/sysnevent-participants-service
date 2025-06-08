@@ -1,8 +1,8 @@
 {
-  "name": "sysnevent-tickets-service",
+  "name": "sysnevent-participants-service",
   "version": "1.0.0",
   "main": "index.js",
-  "repository": "https://github.com/SysNevent/sysnevent-tickets-service.git",
+  "repository": "https://github.com/EricDCamargo/sysnevent-participants-service.git",
   "author": "EricDCamargo <ericdcamargo@gmail.com>",
   "license": "MIT",
   "scripts": {

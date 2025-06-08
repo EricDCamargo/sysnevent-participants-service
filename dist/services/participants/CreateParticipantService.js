@@ -1,0 +1,60 @@
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.CreateParticipantService = void 0;
+const prisma_1 = __importDefault(require("../../prisma"));
+const AppError_1 = require("../../errors/AppError");
+const http_status_codes_1 = require("http-status-codes");
+class CreateParticipantService {
+    execute(_a) {
+        return __awaiter(this, arguments, void 0, function* ({ eventId, name, email, course, semester, ra, maxParticipants }) {
+            // Check if there's already a registration for this event with the same email or RA
+            const existing = yield prisma_1.default.participant.findFirst({
+                where: {
+                    eventId,
+                    OR: [
+                        { email },
+                        { ra: ra !== null && ra !== void 0 ? ra : '' } // use empty string if ra is undefined to avoid null issues because a participant can register without RA, a non fatec student
+                    ]
+                }
+            });
+            if (existing) {
+                throw new AppError_1.AppError('Você já está inscrito neste evento!', http_status_codes_1.StatusCodes.CONFLICT);
+            }
+            // Check current number of participants in the event
+            const participantsCount = yield prisma_1.default.participant.count({
+                where: { eventId }
+            });
+            if (participantsCount >= maxParticipants) {
+                throw new AppError_1.AppError('A quantidade máxima de participantes para este evento já foi atingida.', http_status_codes_1.StatusCodes.BAD_REQUEST);
+            }
+            const participant = yield prisma_1.default.participant.create({
+                data: {
+                    eventId,
+                    name,
+                    email,
+                    course,
+                    semester,
+                    ra,
+                    isPresent: false
+                }
+            });
+            return {
+                data: participant,
+                message: 'Partcipante inscrito com sucesso!'
+            };
+        });
+    }
+}
+exports.CreateParticipantService = CreateParticipantService;

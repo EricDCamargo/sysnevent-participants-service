@@ -1,9 +1,11 @@
 import { Request, NextFunction, Response } from 'express'
 import { verify } from 'jsonwebtoken'
 import { StatusCodes } from 'http-status-codes'
+import { Role } from '../@types/types'
 
 interface Payload {
   sub: string
+  role: Role
 }
 
 export function isAuthenticated(
@@ -23,9 +25,13 @@ export function isAuthenticated(
   const [, token] = authToken.split(' ')
 
   try {
-    const { sub } = verify(token, process.env.JWT_SECRET as string) as Payload
+    const { sub, role } = verify(
+      token,
+      process.env.JWT_SECRET as string
+    ) as Payload
 
     req.user_id = sub
+    req.user_role = role
 
     return next()
   } catch (err) {
@@ -34,4 +40,20 @@ export function isAuthenticated(
       .json({ error: 'Token invalido ou expirado!' })
       .end()
   }
+}
+
+export function isCoordinator(req: Request, res: Response, next: NextFunction) {
+  if (req.user_role !== Role.COORDINATOR) {
+    return res.status(StatusCodes.FORBIDDEN).json({ error: 'Permisão negada!' })
+  }
+
+  return next()
+}
+
+export function isAdmin(req: Request, res: Response, next: NextFunction) {
+  if (req.user_role !== Role.ADMIN) {
+    return res.status(StatusCodes.FORBIDDEN).json({ error: 'Permisão negada!' })
+  }
+
+  return next()
 }

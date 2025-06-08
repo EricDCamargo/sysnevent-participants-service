@@ -1,13 +1,15 @@
 import { Router } from 'express'
 import { isAuthenticated } from './middlewares/isAuthenticated'
-import { CreateTicketController } from './controllers/ticket/CreateTicketController'
-import { ListTicketsController } from './controllers/ticket/ListTicketsController'
-import { DeleteTicketController } from './controllers/ticket/DeleteTicketController'
+import { CreateParticipantController } from './controllers/participants/CreateParticipantController'
+import { ListParticipantsByEventController } from './controllers/participants/ListParticipantsByEventController'
+import { TogglePresenceController } from './controllers/participants/TogglePresenceController'
 
 const router = Router()
 
-router.post('/tickets', isAuthenticated, new CreateTicketController().handle)
-router.get('/tickets', isAuthenticated, new ListTicketsController().handle)
-router.delete('/tickets', isAuthenticated, new DeleteTicketController().handle)
+router.post('/participants', isAuthenticated, new CreateParticipantController().handle)
+
+router.get('/participants', isAuthenticated, new ListParticipantsByEventController().handle)
+
+router.patch('/participants/presence/toggle', isAuthenticated, new TogglePresenceController().handle)
 
 export { router }
