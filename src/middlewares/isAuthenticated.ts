@@ -43,7 +43,7 @@ export function isAuthenticated(
 }
 
 export function isCoordinator(req: Request, res: Response, next: NextFunction) {
-  if (req.user_role !== Role.COORDINATOR) {
+  if (req.user_role !== Role.COORDINATOR && req.user_role !== Role.ADMIN) {
     return res.status(StatusCodes.FORBIDDEN).json({ error: 'Permisão negada!' })
   }
 

@@ -29,7 +29,7 @@ function isAuthenticated(req, res, next) {
     }
 }
 function isCoordinator(req, res, next) {
-    if (req.user_role !== types_1.Role.COORDINATOR) {
+    if (req.user_role !== types_1.Role.COORDINATOR && req.user_role !== types_1.Role.ADMIN) {
         return res.status(http_status_codes_1.StatusCodes.FORBIDDEN).json({ error: 'Permisão negada!' });
     }
     return next();
