@@ -3,6 +3,7 @@ import { AppError } from '../../errors/AppError'
 import { AppResponse } from '../../@types/app.types'
 import { StatusCodes } from 'http-status-codes'
 import { Course, Semester } from '@prisma/client'
+import axios from 'axios'
 
 interface CreateParticipantRequest {
   eventId: string
@@ -24,6 +25,21 @@ class CreateParticipantService {
     ra,
     maxParticipants
   }: CreateParticipantRequest): Promise<AppResponse> {
+    try {
+      const response = await axios.get(
+        `${process.env.EVENT_SERVICE_URL}/details`,
+        {
+          params: { event_id: eventId }
+        }
+      )
+
+      if (response.status !== StatusCodes.OK) {
+        throw new AppError('Evento não encontrado', StatusCodes.NOT_FOUND)
+      }
+    } catch (error) {
+      throw new AppError('Evento não encontrado', StatusCodes.NOT_FOUND)
+    }
+
     // Check if there's already a registration for this event with the same email or RA
     const existing = await prismaClient.participant.findFirst({
       where: {

@@ -16,9 +16,21 @@ exports.CreateParticipantService = void 0;
 const prisma_1 = __importDefault(require("../../prisma"));
 const AppError_1 = require("../../errors/AppError");
 const http_status_codes_1 = require("http-status-codes");
+const axios_1 = __importDefault(require("axios"));
 class CreateParticipantService {
     execute(_a) {
         return __awaiter(this, arguments, void 0, function* ({ eventId, name, email, course, semester, ra, maxParticipants }) {
+            try {
+                const response = yield axios_1.default.get(`${process.env.EVENT_SERVICE_URL}/details`, {
+                    params: { event_id: eventId }
+                });
+                if (response.status !== http_status_codes_1.StatusCodes.OK) {
+                    throw new AppError_1.AppError('Evento não encontrado', http_status_codes_1.StatusCodes.NOT_FOUND);
+                }
+            }
+            catch (error) {
+                throw new AppError_1.AppError('Evento não encontrado', http_status_codes_1.StatusCodes.NOT_FOUND);
+            }
             // Check if there's already a registration for this event with the same email or RA
             const existing = yield prisma_1.default.participant.findFirst({
                 where: {
