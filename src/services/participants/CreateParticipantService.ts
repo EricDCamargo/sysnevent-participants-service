@@ -81,7 +81,13 @@ class CreateParticipantService {
         isPresent: false
       }
     })
-
+    await axios.patch(
+      `${process.env.EVENT_SERVICE_URL}/update-participant-count`,
+      {
+        eventId,
+        action: 'increment'
+      }
+    )
     return {
       data: participant,
       message: 'Partcipante inscrito com sucesso!'
