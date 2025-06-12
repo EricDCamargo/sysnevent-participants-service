@@ -1,17 +1,18 @@
+import { AppResponse } from '../../@types/app.types'
 import prismaClient from '../../prisma'
 
 class ListParticipantsByEventService {
-  async execute(eventId: string) {
+  async execute(eventId: string): Promise<AppResponse> {
     const participants = await prismaClient.participant.findMany({
       where: {
-        eventId,
+        eventId
       },
       orderBy: {
-        name: 'asc',
-      },
+        name: 'asc'
+      }
     })
 
-    return participants
+    return { data: participants, message: 'Lista de participantes.' }
   }
 }
 
