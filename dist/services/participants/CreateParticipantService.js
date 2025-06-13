@@ -19,7 +19,12 @@ const http_status_codes_1 = require("http-status-codes");
 const axios_1 = __importDefault(require("axios"));
 class CreateParticipantService {
     execute(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ eventId, name, email, course, semester, ra, maxParticipants }) {
+        return __awaiter(this, arguments, void 0, function* ({ eventId, name, email, course, semester, ra }) {
+            const rawDomains = process.env.ALLOWED_EMAIL_DOMAINS || '';
+            const allowedDomains = rawDomains
+                .split(',')
+                .map(domain => domain.trim().toLowerCase());
+            let eventData;
             try {
                 const response = yield axios_1.default.get(`${process.env.EVENT_SERVICE_URL}/details`, {
                     params: { event_id: eventId }
@@ -27,9 +32,16 @@ class CreateParticipantService {
                 if (response.status !== http_status_codes_1.StatusCodes.OK) {
                     throw new AppError_1.AppError('Evento não encontrado', http_status_codes_1.StatusCodes.NOT_FOUND);
                 }
+                eventData = response.data.data;
             }
             catch (error) {
                 throw new AppError_1.AppError('Evento não encontrado', http_status_codes_1.StatusCodes.NOT_FOUND);
+            }
+            if (eventData.isRestricted) {
+                const emailIsValid = allowedDomains.some(domain => email.toLowerCase().endsWith(domain));
+                if (!emailIsValid) {
+                    throw new AppError_1.AppError('Este evento é restrito a emails institucionais.', http_status_codes_1.StatusCodes.FORBIDDEN);
+                }
             }
             // Check if there's already a registration for this event with the same email or RA
             const existing = yield prisma_1.default.participant.findFirst({
@@ -48,7 +60,7 @@ class CreateParticipantService {
             const participantsCount = yield prisma_1.default.participant.count({
                 where: { eventId }
             });
-            if (participantsCount >= maxParticipants) {
+            if (participantsCount >= eventData.maxParticipants) {
                 throw new AppError_1.AppError('A quantidade máxima de participantes para este evento já foi atingida.', http_status_codes_1.StatusCodes.BAD_REQUEST);
             }
             const participant = yield prisma_1.default.participant.create({

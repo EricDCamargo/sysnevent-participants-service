@@ -6,13 +6,12 @@ import { AppError } from '../../errors/AppError'
 
 class CreateParticipantController {
   async handle(req: Request, res: Response) {
-    const { eventId, name, email, course, semester, ra, maxParticipants } =
-      req.body
+    const { eventId, name, email, course, semester, ra } = req.body
 
     // Basic validations for required fields
-    if (!eventId || !name || !email || !maxParticipants) {
+    if (!eventId || !name || !email) {
       return res.status(StatusCodes.BAD_REQUEST).json({
-        error: 'Required fields: eventId, name, email, maxParticipants'
+        error: 'Required fields: eventId, name, email'
       })
     }
 
@@ -48,8 +47,7 @@ class CreateParticipantController {
         email,
         course: validatedCourse,
         semester: validatedSemester,
-        ra,
-        maxParticipants
+        ra
       })
 
       return res.status(StatusCodes.CREATED).json(result)

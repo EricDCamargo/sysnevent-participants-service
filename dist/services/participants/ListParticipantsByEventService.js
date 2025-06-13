@@ -19,13 +19,13 @@ class ListParticipantsByEventService {
         return __awaiter(this, void 0, void 0, function* () {
             const participants = yield prisma_1.default.participant.findMany({
                 where: {
-                    eventId,
+                    eventId
                 },
                 orderBy: {
-                    name: 'asc',
-                },
+                    name: 'asc'
+                }
             });
-            return participants;
+            return { data: participants, message: 'Lista de participantes.' };
         });
     }
 }

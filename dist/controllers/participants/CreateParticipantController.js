@@ -17,11 +17,11 @@ const AppError_1 = require("../../errors/AppError");
 class CreateParticipantController {
     handle(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { eventId, name, email, course, semester, ra, maxParticipants } = req.body;
+            const { eventId, name, email, course, semester, ra } = req.body;
             // Basic validations for required fields
-            if (!eventId || !name || !email || !maxParticipants) {
+            if (!eventId || !name || !email) {
                 return res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({
-                    error: 'Required fields: eventId, name, email, maxParticipants'
+                    error: 'Required fields: eventId, name, email'
                 });
             }
             // enum´s validations
@@ -53,8 +53,7 @@ class CreateParticipantController {
                     email,
                     course: validatedCourse,
                     semester: validatedSemester,
-                    ra,
-                    maxParticipants
+                    ra
                 });
                 return res.status(http_status_codes_1.StatusCodes.CREATED).json(result);
             }

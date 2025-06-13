@@ -12,7 +12,6 @@ interface CreateParticipantRequest {
   course?: Course
   semester?: Semester
   ra?: string
-  maxParticipants: number
 }
 
 class CreateParticipantService {
@@ -22,9 +21,14 @@ class CreateParticipantService {
     email,
     course,
     semester,
-    ra,
-    maxParticipants
+    ra
   }: CreateParticipantRequest): Promise<AppResponse> {
+    const rawDomains = process.env.ALLOWED_EMAIL_DOMAINS || ''
+    const allowedDomains = rawDomains
+      .split(',')
+      .map(domain => domain.trim().toLowerCase())
+
+    let eventData
     try {
       const response = await axios.get(
         `${process.env.EVENT_SERVICE_URL}/details`,
@@ -36,8 +40,22 @@ class CreateParticipantService {
       if (response.status !== StatusCodes.OK) {
         throw new AppError('Evento não encontrado', StatusCodes.NOT_FOUND)
       }
+      eventData = response.data.data
     } catch (error) {
       throw new AppError('Evento não encontrado', StatusCodes.NOT_FOUND)
+    }
+
+    if (eventData.isRestricted) {
+      const emailIsValid = allowedDomains.some(domain =>
+        email.toLowerCase().endsWith(domain)
+      )
+
+      if (!emailIsValid) {
+        throw new AppError(
+          'Este evento é restrito a emails institucionais.',
+          StatusCodes.FORBIDDEN
+        )
+      }
     }
 
     // Check if there's already a registration for this event with the same email or RA
@@ -63,7 +81,7 @@ class CreateParticipantService {
       where: { eventId }
     })
 
-    if (participantsCount >= maxParticipants) {
+    if (participantsCount >= eventData.maxParticipants) {
       throw new AppError(
         'A quantidade máxima de participantes para este evento já foi atingida.',
         StatusCodes.BAD_REQUEST
