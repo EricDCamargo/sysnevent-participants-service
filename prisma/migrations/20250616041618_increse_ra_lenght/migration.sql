@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Participant" ALTER COLUMN "ra" SET DATA TYPE VARCHAR(15);
