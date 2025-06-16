@@ -8,6 +8,6 @@ const ListParticipantsByEventController_1 = require("./controllers/participants/
 const TogglePresenceController_1 = require("./controllers/participants/TogglePresenceController");
 const router = (0, express_1.Router)();
 exports.router = router;
-router.post('/', isAuthenticated_1.isAuthenticated, new CreateParticipantController_1.CreateParticipantController().handle);
+router.post('/', new CreateParticipantController_1.CreateParticipantController().handle);
 router.get('/', isAuthenticated_1.isAuthenticated, new ListParticipantsByEventController_1.ListParticipantsByEventController().handle);
 router.patch('/presence/toggle', isAuthenticated_1.isAuthenticated, new TogglePresenceController_1.TogglePresenceController().handle);

@@ -6,7 +6,7 @@ import { TogglePresenceController } from './controllers/participants/TogglePrese
 
 const router = Router()
 
-router.post('/', isAuthenticated, new CreateParticipantController().handle)
+router.post('/', new CreateParticipantController().handle)
 router.get('/', isAuthenticated, new ListParticipantsByEventController().handle)
 router.patch('/presence/toggle', isAuthenticated, new TogglePresenceController().handle)
 
