@@ -12,27 +12,22 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CreateParticipantService = void 0;
-const prisma_1 = __importDefault(require("../../prisma"));
-class CreateParticipantService {
-    execute(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ eventId, name, email, course, semester, ra }) {
-            const participant = yield prisma_1.default.participant.create({
-                data: {
-                    eventId,
-                    name,
-                    email,
-                    course,
-                    semester,
-                    ra,
-                    isPresent: false
-                }
-            });
-            return {
-                data: participant,
-                message: 'Partcipante inscrito com sucesso!'
-            };
+exports.sendEmail = sendEmail;
+const nodemailer_1 = __importDefault(require("nodemailer"));
+function sendEmail(_a) {
+    return __awaiter(this, arguments, void 0, function* ({ to, subject, emailBody }) {
+        const transporter = nodemailer_1.default.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS
+            }
         });
-    }
+        yield transporter.sendMail({
+            from: process.env.EMAIL_USER,
+            to,
+            subject,
+            text: emailBody
+        });
+    });
 }
-exports.CreateParticipantService = CreateParticipantService;
