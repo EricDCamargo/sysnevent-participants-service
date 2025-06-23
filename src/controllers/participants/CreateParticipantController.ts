@@ -82,12 +82,17 @@ class CreateParticipantController {
       }
     }
 
-    // Verifica se já existe inscrição para este evento com o mesmo email ou RA
+    const whereClause: any = {
+      eventId,
+      OR: [{ email }]
+    }
+
+    if (ra) {
+      whereClause.OR.push({ ra })
+    }
+
     const existing = await prismaClient.participant.findFirst({
-      where: {
-        eventId,
-        OR: [{ email }, { ra: ra ?? '' }]
-      }
+      where: whereClause
     })
     if (existing) {
       return res.status(StatusCodes.CONFLICT).json({

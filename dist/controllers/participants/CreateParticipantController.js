@@ -86,12 +86,15 @@ class CreateParticipantController {
                     });
                 }
             }
-            // Verifica se já existe inscrição para este evento com o mesmo email ou RA
+            const whereClause = {
+                eventId,
+                OR: [{ email }]
+            };
+            if (ra) {
+                whereClause.OR.push({ ra });
+            }
             const existing = yield prisma_1.default.participant.findFirst({
-                where: {
-                    eventId,
-                    OR: [{ email }, { ra: ra !== null && ra !== void 0 ? ra : '' }]
-                }
+                where: whereClause
             });
             if (existing) {
                 return res.status(http_status_codes_1.StatusCodes.CONFLICT).json({

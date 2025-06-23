@@ -10,6 +10,26 @@ const routes_1 = require("./routes");
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use((0, cors_1.default)());
+app.use((req, res, next) => {
+    console.log('\n--- [MICROSERVIÇO PARTICIPANTES] Requisição recebida ---');
+    console.log(`[METHOD] ${req.method}`);
+    console.log(`[URL] ${req.url}`); // <- importante
+    console.log(`[ORIGINAL URL] ${req.originalUrl}`); // <- também ajuda
+    console.log('[HEADERS]', req.headers);
+    console.log('[BODY]', req.body);
+    console.log('--------------------------------------------------\n');
+    const originalSend = res.send;
+    res.send = function (body) {
+        // Log da response ao enviar
+        console.log('\n--- [MICROSERVIÇO PARTICIPANTES] Resposta enviada ---');
+        console.log(`[STATUS] ${res.statusCode}`);
+        console.log('[HEADERS]', res.getHeaders());
+        console.log('[BODY]', body);
+        console.log('--------------------------------------------------\n');
+        return originalSend.call(this, body);
+    };
+    next();
+});
 app.use(routes_1.router);
 app.use((err, req, res, next) => {
     if (err instanceof Error) {
