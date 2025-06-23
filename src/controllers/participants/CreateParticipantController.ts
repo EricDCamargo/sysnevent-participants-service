@@ -87,10 +87,9 @@ class CreateParticipantController {
       OR: [{ email }]
     }
 
-    if (ra) {
-      whereClause.OR.push({ ra })
+    if (ra && ra.trim()) {
+      whereClause.OR.push({ ra: ra.trim() })
     }
-
     const existing = await prismaClient.participant.findFirst({
       where: whereClause
     })

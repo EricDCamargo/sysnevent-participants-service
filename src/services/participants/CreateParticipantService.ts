@@ -27,7 +27,7 @@ class CreateParticipantService {
         email,
         course,
         semester,
-        ra,
+        ...(ra?.trim() && { ra: ra.trim() }),
         isPresent: false
       }
     })

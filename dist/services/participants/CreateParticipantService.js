@@ -18,15 +18,11 @@ class CreateParticipantService {
     execute(_a) {
         return __awaiter(this, arguments, void 0, function* ({ eventId, name, email, course, semester, ra }) {
             const participant = yield prisma_1.default.participant.create({
-                data: {
-                    eventId,
+                data: Object.assign(Object.assign({ eventId,
                     name,
                     email,
                     course,
-                    semester,
-                    ra,
-                    isPresent: false
-                }
+                    semester }, ((ra === null || ra === void 0 ? void 0 : ra.trim()) && { ra: ra.trim() })), { isPresent: false })
             });
             return {
                 data: participant,

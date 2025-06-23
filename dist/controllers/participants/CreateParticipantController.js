@@ -90,8 +90,8 @@ class CreateParticipantController {
                 eventId,
                 OR: [{ email }]
             };
-            if (ra) {
-                whereClause.OR.push({ ra });
+            if (ra && ra.trim()) {
+                whereClause.OR.push({ ra: ra.trim() });
             }
             const existing = yield prisma_1.default.participant.findFirst({
                 where: whereClause
