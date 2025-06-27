@@ -20,26 +20,29 @@ class ListFilteredParticipantsService {
         this.allowedDomains = envDomains.split(',').map(d => d.trim());
     }
     execute(_a) {
-        return __awaiter(this, arguments, void 0, function* ({ event_id, apenasAlunos, apenasFatec, apenasExternos }) {
+        return __awaiter(this, arguments, void 0, function* ({ event_id, onlyStudents, onlyFatec, onlyExternal, onlyPresent }) {
             const where = {
                 eventId: event_id
             };
+            if (onlyPresent) {
+                where.isPresent = true;
+            }
             const orFilters = [];
-            if (apenasAlunos) {
+            if (onlyStudents) {
                 orFilters.push({
                     NOT: {
                         ra: null
                     }
                 });
             }
-            if (apenasFatec) {
+            if (onlyFatec) {
                 orFilters.push(...this.allowedDomains.map(domain => ({
                     email: {
                         endsWith: domain
                     }
                 })));
             }
-            if (apenasExternos) {
+            if (onlyExternal) {
                 orFilters.push({
                     AND: [
                         { ra: null },
@@ -55,7 +58,6 @@ class ListFilteredParticipantsService {
                     ]
                 });
             }
-            // Se houver filtros aplicados, adiciona como OR
             if (orFilters.length > 0) {
                 where.OR = orFilters;
             }
@@ -63,15 +65,14 @@ class ListFilteredParticipantsService {
                 where
             });
             const getGroupScore = (p) => {
-                const isAluno = !!p.ra;
+                const isStudent = !!p.ra;
                 const isFatec = this.allowedDomains.some(domain => p.email.endsWith(domain));
-                if (isAluno)
-                    return 0; // alunos com RA
+                if (isStudent)
+                    return 0;
                 if (isFatec)
-                    return 1; // domínio fatec, mas sem RA
-                return 2; // externos
+                    return 1;
+                return 2;
             };
-            // Ordenação composta: grupo → nome
             participants.sort((a, b) => {
                 const groupDiff = getGroupScore(a) - getGroupScore(b);
                 if (groupDiff !== 0)
@@ -80,7 +81,7 @@ class ListFilteredParticipantsService {
             });
             return {
                 data: participants,
-                message: 'Participantes filtrados com sucesso.'
+                message: 'Filtered participants retrieved successfully.'
             };
         });
     }

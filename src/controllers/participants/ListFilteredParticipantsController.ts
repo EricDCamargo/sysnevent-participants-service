@@ -5,11 +5,17 @@ import { ListFilteredParticipantsService } from '../../services/participants/Lis
 
 class ListFilteredParticipantsController {
   async handle(req: Request, res: Response) {
-    const { event_id, apenasAlunos, apenasFatec, apenasExternos } = req.query
+    const {
+      event_id,
+      onlyStudents,
+      onlyFatec,
+      onlyExternal,
+      onlyPresent
+    } = req.query
 
     if (!event_id) {
       return res.status(StatusCodes.BAD_REQUEST).json({
-        error: 'Parâmetro "event_id" é obrigatório.'
+        error: 'Parameter "event_id" is required.'
       })
     }
 
@@ -18,9 +24,10 @@ class ListFilteredParticipantsController {
 
       const result = await service.execute({
         event_id: event_id as string,
-        apenasAlunos: apenasAlunos === 'true',
-        apenasFatec: apenasFatec === 'true',
-        apenasExternos: apenasExternos === 'true'
+        onlyStudents: onlyStudents === 'true',
+        onlyFatec: onlyFatec === 'true',
+        onlyExternal: onlyExternal === 'true',
+        onlyPresent: onlyPresent === 'true'
       })
 
       return res.status(StatusCodes.OK).json(result)
@@ -30,7 +37,7 @@ class ListFilteredParticipantsController {
       }
 
       return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-        error: 'Erro ao buscar participantes filtrados.'
+        error: 'Failed to fetch filtered participants.'
       })
     }
   }

@@ -3,9 +3,10 @@ import { AppResponse } from '../../@types/app.types'
 
 interface FilterParams {
   event_id: string
-  apenasAlunos: boolean
-  apenasFatec: boolean
-  apenasExternos: boolean
+  onlyStudents: boolean
+  onlyFatec: boolean
+  onlyExternal: boolean
+  onlyPresent: boolean
 }
 
 class ListFilteredParticipantsService {
@@ -18,17 +19,22 @@ class ListFilteredParticipantsService {
 
   async execute({
     event_id,
-    apenasAlunos,
-    apenasFatec,
-    apenasExternos
+    onlyStudents,
+    onlyFatec,
+    onlyExternal,
+    onlyPresent
   }: FilterParams): Promise<AppResponse> {
     const where: any = {
       eventId: event_id
     }
 
+    if (onlyPresent) {
+      where.isPresent = true
+    }
+
     const orFilters: any[] = []
 
-    if (apenasAlunos) {
+    if (onlyStudents) {
       orFilters.push({
         NOT: {
           ra: null
@@ -36,7 +42,7 @@ class ListFilteredParticipantsService {
       })
     }
 
-    if (apenasFatec) {
+    if (onlyFatec) {
       orFilters.push(
         ...this.allowedDomains.map(domain => ({
           email: {
@@ -46,7 +52,7 @@ class ListFilteredParticipantsService {
       )
     }
 
-    if (apenasExternos) {
+    if (onlyExternal) {
       orFilters.push({
         AND: [
           { ra: null },
@@ -63,7 +69,6 @@ class ListFilteredParticipantsService {
       })
     }
 
-    // Se houver filtros aplicados, adiciona como OR
     if (orFilters.length > 0) {
       where.OR = orFilters
     }
@@ -73,17 +78,16 @@ class ListFilteredParticipantsService {
     })
 
     const getGroupScore = (p: any): number => {
-      const isAluno = !!p.ra
+      const isStudent = !!p.ra
       const isFatec = this.allowedDomains.some(domain =>
         p.email.endsWith(domain)
       )
 
-      if (isAluno) return 0 // alunos com RA
-      if (isFatec) return 1 // domínio fatec, mas sem RA
-      return 2 // externos
+      if (isStudent) return 0
+      if (isFatec) return 1
+      return 2
     }
 
-    // Ordenação composta: grupo → nome
     participants.sort((a, b) => {
       const groupDiff = getGroupScore(a) - getGroupScore(b)
       if (groupDiff !== 0) return groupDiff
@@ -92,7 +96,7 @@ class ListFilteredParticipantsService {
 
     return {
       data: participants,
-      message: 'Participantes filtrados com sucesso.'
+      message: 'Filtered participants retrieved successfully.'
     }
   }
 }
