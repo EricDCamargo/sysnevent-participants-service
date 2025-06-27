@@ -16,24 +16,6 @@ class ListFilteredParticipantsController {
     }
 
     try {
-      try {
-        await axios.get(`${process.env.EVENT_SERVICE_URL}/events/details`, {
-          params: { event_id },
-          headers: { Authorization: req.headers.authorization || '' }
-        })
-      } catch (err: any) {
-        // Se retornar 404 do Event Service, repassamos
-        const status =
-          err.response?.status === StatusCodes.NOT_FOUND
-            ? StatusCodes.NOT_FOUND
-            : StatusCodes.BAD_GATEWAY
-
-        throw new AppError(
-          err.response?.data?.error || 'Event not found.',
-          status
-        )
-      }
-
       const service = new ListFilteredParticipantsService()
 
       const result = await service.execute({
